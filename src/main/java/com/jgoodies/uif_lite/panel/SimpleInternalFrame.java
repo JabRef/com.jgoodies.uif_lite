@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003 JGoodies Karsten Lentzsch. All Rights Reserved.
+ * Copyright (c) 2000-2006 JGoodies Karsten Lentzsch. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met:
@@ -30,13 +30,10 @@
 
 package com.jgoodies.uif_lite.panel;
 
-import com.jgoodies.looks.LookUtils;
-
 import java.awt.*;
 
 import javax.swing.*;
 import javax.swing.border.AbstractBorder;
-
 
 /** 
  * A <code>JPanel</code> subclass that has a drop shadow border and 
@@ -58,7 +55,7 @@ import javax.swing.border.AbstractBorder;
  * be displayed as selected.
  * 
  * @author Karsten Lentzsch
- * @version $Revision$
+ * @version $Revision: 1.3 $
  * 
  * @see    javax.swing.JInternalFrame
  * @see    javax.swing.JDesktopPane
@@ -66,16 +63,18 @@ import javax.swing.border.AbstractBorder;
 
 public class SimpleInternalFrame extends JPanel {
 
-    private JLabel          titleLabel;
-    private GradientPanel   gradientPanel;
-    private JPanel          headerPanel;
-    private boolean        isSelected;
+    private JLabel        titleLabel;
+    private GradientPanel gradientPanel;
+    private JPanel        headerPanel;
+    private boolean       selected;
     
     
     // Instance Creation ****************************************************
 
     /**
-     * Constructs a <code>SimpleInternalFrame</code> with the specified title.
+     * Constructs a SimpleInternalFrame with the specified title.
+     * The title is intended to be non-blank, or in other words
+     * should contain non-space characters.
      * 
      * @param title       the initial title
      */
@@ -85,7 +84,7 @@ public class SimpleInternalFrame extends JPanel {
     
     
     /**
-     * Constructs a <code>SimpleInternalFrame</code> with the specified 
+     * Constructs a SimpleInternalFrame with the specified 
      * icon, and title.
      * 
      * @param icon        the initial icon
@@ -97,7 +96,7 @@ public class SimpleInternalFrame extends JPanel {
 
     
     /**
-     * Constructs a <code>SimpleInternalFrame</code> with the specified 
+     * Constructs a SimpleInternalFrame with the specified 
      * title, tool bar, and content panel.
      * 
      * @param title       the initial title
@@ -110,7 +109,7 @@ public class SimpleInternalFrame extends JPanel {
     
 
     /**
-     * Constructs a <code>SimpleInternalFrame</code> with the specified 
+     * Constructs a SimpleInternalFrame with the specified 
      * icon, title, tool bar, and content panel.
      * 
      * @param icon        the initial icon
@@ -124,7 +123,7 @@ public class SimpleInternalFrame extends JPanel {
         JToolBar bar,
         JComponent content) {
         super(new BorderLayout());
-        this.isSelected = false;
+        this.selected = false;
         this.titleLabel = new JLabel(title, icon, SwingConstants.LEADING);
         JPanel top = buildHeader(titleLabel, bar);
 
@@ -164,9 +163,7 @@ public class SimpleInternalFrame extends JPanel {
 
     /**
      * Returns the frame's title text.
-     * 
-     * @return String   the current title text
-     */
+     *      * @return String   the current title text     */
     public String getTitle() {
         return titleLabel.getText();
     }
@@ -174,9 +171,7 @@ public class SimpleInternalFrame extends JPanel {
     
     /**
      * Sets a new title text.
-     * 
-     * @param newText  the title text tp be set
-     */
+     *      * @param newText  the title text tp be set     */
     public void setTitle(String newText) {
         String oldText = getTitle();
         titleLabel.setText(newText);
@@ -220,9 +215,7 @@ public class SimpleInternalFrame extends JPanel {
     
     /**
      * Returns the content - null, if none has been set.
-     * 
-     * @return the current content
-     */
+     *      * @return the current content     */
     public Component getContent() {
         return hasContent() ? getComponent(1) : null;
     }
@@ -230,9 +223,7 @@ public class SimpleInternalFrame extends JPanel {
     
     /**
      * Sets a new panel content; replaces any existing content, if existing.
-     * 
-     * @param newContent   the panel's new content
-     */
+     *      * @param newContent   the panel's new content     */
     public void setContent(Component newContent) {
         Component oldContent = getContent();
         if (hasContent()) {
@@ -252,7 +243,7 @@ public class SimpleInternalFrame extends JPanel {
      *                  (currently active) and false means it is not  
      */
     public boolean isSelected() {
-        return isSelected;
+        return selected;
     }
     
     
@@ -267,7 +258,7 @@ public class SimpleInternalFrame extends JPanel {
      */
     public void setSelected(boolean newValue) {
         boolean oldValue = isSelected();
-        isSelected = newValue;
+        selected = newValue;
         updateHeader();
         firePropertyChange("selected", oldValue, newValue);
     }
@@ -332,26 +323,25 @@ public class SimpleInternalFrame extends JPanel {
     private boolean hasContent() {
         return getComponentCount() > 1;
     }
-    
-    /**
+        /**
      * Determines and answers the header's text foreground color.
      * Tries to lookup a special color from the L&amp;F.
      * In case it is absent, it uses the standard internal frame forground.
      * 
-     * @param selected   true to lookup the active color, false for the inactive
+     * @param isSelected   true to lookup the active color, false for the inactive
      * @return the color of the foreground text
      */
-    protected Color getTextForeground(boolean selected) {
+    protected Color getTextForeground(boolean isSelected) {
         Color c =
             UIManager.getColor(
-                selected
+                isSelected
                     ? "SimpleInternalFrame.activeTitleForeground"
                     : "SimpleInternalFrame.inactiveTitleForeground");
         if (c != null) {
             return c;
         }
         return UIManager.getColor(
-            selected 
+            isSelected 
                 ? "InternalFrame.activeTitleForeground" 
                 : "Label.foreground");
 
@@ -365,13 +355,8 @@ public class SimpleInternalFrame extends JPanel {
      * @return the color of the header's background
      */
     protected Color getHeaderBackground() {
-        
         Color c =
             UIManager.getColor("SimpleInternalFrame.activeTitleBackground");
-        if (c != null)
-            return c;
-        if (LookUtils.IS_OS_WINDOWS_MODERN)
-            c = UIManager.getColor("InternalFrame.activeTitleGradient");
         return c != null
             ? c
             : UIManager.getColor("InternalFrame.activeTitleBackground");
@@ -446,8 +431,11 @@ public class SimpleInternalFrame extends JPanel {
         }
     }
 
-    // A panel with a horizontal gradient background.
-    private static class GradientPanel extends JPanel {
+    
+    /**
+     * A panel with a horizontal gradient background.
+     */
+    private static final class GradientPanel extends JPanel {
         
         private GradientPanel(LayoutManager lm, Color background) {
             super(lm);
